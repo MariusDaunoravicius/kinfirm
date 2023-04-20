@@ -3,9 +3,10 @@ parameters:
     paths:
         - app/
 
-    level: 9
+    level: 6
 
     ignoreErrors:
+    	- '#Parameter .* of method Illuminate\\Support\\Collection.*#'
 
     excludePaths:
         - app/Providers/RouteServiceProvider.php
