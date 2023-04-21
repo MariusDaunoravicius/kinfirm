@@ -12,4 +12,8 @@ class City extends Model
 {
     use HasFactory;
     use HasUlids;
+
+    protected $fillable = [
+        'name',
+    ];
 }

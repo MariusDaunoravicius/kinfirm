@@ -15,6 +15,7 @@ return new class extends Migration
             $table->ulid('city_id')->index();
 
             $table->string('sku')->index();
+            $table->integer('stock')->unsigned();
 
             $table->unique(['sku', 'city_id']);
 

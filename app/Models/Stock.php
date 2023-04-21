@@ -12,4 +12,17 @@ class Stock extends Model
 {
     use HasFactory;
     use HasUlids;
+
+    protected $fillable = [
+        'city_id',
+        'sku',
+        'stock',
+    ];
+
+    /**
+     * @var array<string,string>
+     */
+    protected $casts = [
+        'stock' => 'int',
+    ];
 }

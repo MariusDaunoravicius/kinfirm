@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\DTO\ProductDTO;
 use App\DTO\TagDTO;
-use App\Exceptions\ProductImportFailed;
 use App\Models\Product;
 use App\Models\Tag;
 use Exception;
@@ -26,16 +25,13 @@ class ProductCreator
             $product->tags()->attach(id: $tagIds);
 
             DB::commit();
+
+            return $product;
         } catch (Exception $exception) {
             DB::rollBack();
 
-            throw new ProductImportFailed(
-                message: 'Failed to import product with SKU ['.$productDTO->getSKU().']',
-                previous: $exception,
-            );
+            throw $exception;
         }
-
-        return $product;
     }
 
     /**
