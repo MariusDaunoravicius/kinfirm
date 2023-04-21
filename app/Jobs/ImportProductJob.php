@@ -27,7 +27,7 @@ class ImportProductJob implements ShouldQueue
     public function handle(ProductCreator $productCreator): void
     {
         try {
-            $productCreator->create($this->productDTO);
+            $productCreator->create(productDTO: $this->productDTO);
         } catch (Exception $exception) {
             Log::error($exception->getMessage());
 

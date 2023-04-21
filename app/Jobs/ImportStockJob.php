@@ -17,12 +17,14 @@ class ImportStockJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(private readonly StockDTO $stockDTO) {}
+    public function __construct(private readonly StockDTO $stockDTO)
+    {
+    }
 
     public function handle(StockCreator $stockCreator): void
     {
         try {
-            $stockCreator->create($this->stockDTO);
+            $stockCreator->create(stockDTO: $this->stockDTO);
         } catch (Exception $exception) {
             $message = sprintf(
                 'Failed to import stock with SKU [%s], city [%s]',
@@ -30,7 +32,7 @@ class ImportStockJob implements ShouldQueue
                 $this->stockDTO->getCity(),
             );
 
-            Log::error($exception->getMessage());
+            Log::error(message: $exception->getMessage());
 
             throw new StockImportFailed(
                 message: $message,
