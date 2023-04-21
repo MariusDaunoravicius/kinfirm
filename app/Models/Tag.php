@@ -18,7 +18,7 @@ class Tag extends Model
         'title',
     ];
 
-    public function tags(): BelongsToMany
+    public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class);
     }

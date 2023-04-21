@@ -8,8 +8,6 @@ use App\Clients\Contracts\DistributorClient;
 use App\Console\Commands\ImportProductsCommand;
 use App\Jobs\ImportProductJob;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Http;
-use Queue;
 use Tests\TestCase;
 
 class ImportProductsCommandTest extends TestCase

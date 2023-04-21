@@ -13,9 +13,8 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 
     /**
-     * @param array<string,string> $variables
-     * @param Collection<int,TagDTO>|null $tags
-     * @return ProductDTO
+     * @param  array<string,string>  $variables
+     * @param  Collection<int,TagDTO>|null  $tags
      */
     protected function mockProductDTO(array $variables = [], ?Collection $tags = null): ProductDTO
     {

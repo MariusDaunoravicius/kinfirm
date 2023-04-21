@@ -18,6 +18,7 @@ use Tests\TestCase;
 class ImportProductJobTest extends TestCase
 {
     private MockObject|ProductCreator $productCreatorMock;
+
     private MockObject|TagCreator $tagCreatorMock;
 
     public function setUp(): void

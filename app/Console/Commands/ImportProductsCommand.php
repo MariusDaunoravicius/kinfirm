@@ -15,17 +15,15 @@ class ImportProductsCommand extends Command
 
     protected $description = 'Imports products from URL';
 
-
     public function __construct(
         private readonly DistributorClient $distributorClient
-    )
-    {
+    ) {
         parent::__construct();
     }
 
     public function handle(): void
     {
         $products = $this->distributorClient->fetchProducts();
-        $products->each(callback: static fn(ProductDTO $productDTO) => ImportProductJob::dispatch($productDTO));
+        $products->each(callback: static fn (ProductDTO $productDTO) => ImportProductJob::dispatch($productDTO));
     }
 }

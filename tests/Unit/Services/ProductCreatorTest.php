@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use App\DTO\ProductDTO;
 use App\Services\ProductCreator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class ProductCreatorTest extends TestCase

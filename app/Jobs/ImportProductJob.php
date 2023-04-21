@@ -22,7 +22,8 @@ class ImportProductJob implements ShouldQueue
 
     public function __construct(
         private readonly ProductDTO $productDTO,
-    ) {}
+    ) {
+    }
 
     public function handle(ProductCreator $productCreator, TagCreator $tagCreator): void
     {
