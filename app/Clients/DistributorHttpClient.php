@@ -22,8 +22,7 @@ class DistributorHttpClient implements DistributorClient
     public function __construct(
         private readonly ProductDTOFactory $productDTOFactory,
         private readonly StockDTOFactory $stockDTOFactory,
-    )
-    {
+    ) {
         $this->httpClient = Http::baseUrl(url: self::BASE_URL);
     }
 

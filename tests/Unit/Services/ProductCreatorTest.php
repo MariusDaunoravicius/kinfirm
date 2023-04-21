@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\ProductImportFailed;
+use App\Models\Product;
+use App\Models\Tag;
 use App\Services\ProductCreator;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,9 +16,11 @@ class ProductCreatorTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_create(): void
+    public function test_create_success(): void
     {
-        $productDTO = $this->mockProductDTO();
+        $tagDTO = $this->mockTagDTO();
+        $tags = collect([$tagDTO]);
+        $productDTO = $this->mockProductDTO(tags: $tags);
 
         $product = (new ProductCreator())->create(productDTO: $productDTO);
 
@@ -41,5 +47,28 @@ class ProductCreatorTest extends TestCase
         );
 
         self::assertDatabaseHas(table: 'products', data: ['sku' => $productDTO->getSKU()]);
+        self::assertDatabaseHas(table: 'tags', data: ['title' => $tagDTO->getTitle()]);
+        $this->assertDatabaseHas(
+            'product_tag',
+            [
+                'product_id' => Product::first()->id,
+                'tag_id' => Tag::first()->id,
+            ],
+        );
+    }
+
+    public function test_create_fail(): void
+    {
+        $productDTO = $this->mockProductDTO();
+
+        DB::shouldReceive('beginTransaction')->once()->andThrowExceptions([new \Exception()]);
+        DB::shouldReceive('commit')->never();
+        DB::shouldReceive('rollBack')->once();
+
+        $this->expectException(ProductImportFailed::class);
+
+        (new ProductCreator())->create(productDTO: $productDTO);
+
+        self::assertDatabaseMissing(table: 'products', data: ['sku' => $productDTO->getSKU()]);
     }
 }

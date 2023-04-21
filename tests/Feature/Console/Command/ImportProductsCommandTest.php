@@ -54,14 +54,11 @@ class ImportProductsCommandTest extends TestCase
             ],
         );
 
-        $product = Product::first();
-        $tag = Tag::first();
-
         $this->assertDatabaseHas(
             'product_tag',
             [
-                'product_id' => $product->id,
-                'tag_id' => $tag->id,
+                'product_id' => Product::first()->id,
+                'tag_id' => Tag::first()->id,
             ],
         );
     }
