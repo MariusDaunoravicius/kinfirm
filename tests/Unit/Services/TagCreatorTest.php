@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Services;
 
 use App\DTO\TagDTO;
@@ -19,13 +21,13 @@ class TagCreatorTest extends TestCase
             title: $title,
         );
 
-        $tag = (new TagCreator())->create($tagDTO);
+        $tag = (new TagCreator())->create(tagDTO: $tagDTO);
 
         self::assertEquals(
-            [
+            expected: [
                 'title' => $title,
             ],
-            $tag->only(
+            actual: $tag->only(
                 attributes: [
                     'title',
                 ],

@@ -22,7 +22,7 @@ class DistributorClientTest extends TestCase
             'tags' => [
                 ['title' => fake()->word],
             ],
-            'updatedAt' => fake()->date,
+            'updated_at' => fake()->date,
         ];
 
         Http::fake([

@@ -16,29 +16,16 @@ class ProductCreatorTest extends TestCase
 
     public function test_create(): void
     {
-        $sku = fake()->word;
-        $description = fake()->word;
-        $size = fake()->word;
-        $photo = fake()->imageUrl;
-        $updatedAt = new Carbon();
+        $productDTO = $this->mockProductDTO();
 
-        $productDTO = new ProductDTO(
-            sku: $sku,
-            description: $description,
-            size: $size,
-            photo: $photo,
-            tags: collect(),
-            updatedAt: $updatedAt,
-        );
-
-        $product = (new ProductCreator())->create($productDTO);
+        $product = (new ProductCreator())->create(productDTO: $productDTO);
 
         self::assertEquals(
             [
-                'sku' => $sku,
-                'description' => $description,
-                'size' => $size,
-                'photo' => $photo,
+                'sku' => $productDTO->getSKU(),
+                'description' => $productDTO->getDescription(),
+                'size' => $productDTO->getSize(),
+                'photo' => $productDTO->getPhoto(),
             ],
             $product->only(
                 attributes: [
@@ -51,10 +38,10 @@ class ProductCreatorTest extends TestCase
         );
 
         self::assertEquals(
-            $updatedAt->format('Y-m-d'),
-            $product->product_updated_at->format('Y-m-d'),
+            expected: $productDTO->getUpdatedAt()->format(format: 'Y-m-d'),
+            actual: $product->product_updated_at->format(format: 'Y-m-d'),
         );
 
-        self::assertDatabaseHas(table: 'products', data: ['sku' => $sku]);
+        self::assertDatabaseHas(table: 'products', data: ['sku' => $productDTO->getSKU()]);
     }
 }
