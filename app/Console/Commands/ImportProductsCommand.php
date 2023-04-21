@@ -13,7 +13,7 @@ class ImportProductsCommand extends Command
 {
     protected $signature = 'app:import-products';
 
-    protected $description = 'Imports products from URL';
+    protected $description = 'Imports products from distributor APIL';
 
     public function __construct(
         private readonly DistributorClient $distributorClient
