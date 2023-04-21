@@ -9,28 +9,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Product extends Model
+class Tag extends Model
 {
     use HasFactory;
     use HasUlids;
 
     protected $fillable = [
-        'sku',
-        'description',
-        'size',
-        'photo',
-        'product_updated_at',
-    ];
-
-    /**
-     * @var string[]
-     */
-    protected $casts = [
-        'product_updated_at' => 'date',
+        'title',
     ];
 
     public function tags(): BelongsToMany
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Product::class);
     }
 }

@@ -22,7 +22,7 @@ class ProductDTO
     ) {
     }
 
-    public function getSku(): string
+    public function getSKU(): string
     {
         return $this->sku;
     }
