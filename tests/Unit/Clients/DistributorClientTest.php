@@ -6,7 +6,9 @@ namespace Tests\Unit\Clients;
 
 use App\Clients\DistributorHttpClient;
 use App\DTO\ProductDTO;
+use App\DTO\StockDTO;
 use App\Factories\ProductDTOFactory;
+use App\Factories\StockDTOFactory;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -31,6 +33,8 @@ class DistributorClientTest extends TestCase
 
         $productDTOMock = $this->createMock(ProductDTO::class);
 
+        $stockDTOFactoryMock = $this->createMock(StockDTOFactory::class);
+
         $productDTOFactoryMock = $this->createMock(ProductDTOFactory::class);
         $productDTOFactoryMock
             ->expects(self::once())
@@ -38,8 +42,36 @@ class DistributorClientTest extends TestCase
             ->with($product)
             ->willReturn($productDTOMock);
 
-        $products = (new DistributorHttpClient($productDTOFactoryMock))->fetchProducts();
+        $products = (new DistributorHttpClient($productDTOFactoryMock, $stockDTOFactoryMock))->fetchProducts();
 
         self::assertEquals(collect([$productDTOMock]), $products);
+    }
+
+    public function test_fetch_stock(): void
+    {
+        $stock = [
+            'sku' => fake()->word,
+            'stock' => fake()->randomNumber(2),
+            'city' => fake()->city,
+        ];
+
+        Http::fake([
+            'https://kinfirm.com/app/uploads/laravel-task/stocks.json' => Http::response([$stock]),
+        ]);
+
+        $stockDTOMock = $this->createMock(StockDTO::class);
+
+        $stockDTOFactoryMock = $this->createMock(StockDTOFactory::class);
+        $stockDTOFactoryMock
+            ->expects(self::once())
+            ->method('createFromArray')
+            ->with($stock)
+            ->willReturn($stockDTOMock);
+
+        $productDTOFactoryMock = $this->createMock(ProductDTOFactory::class);
+
+        $stocks = (new DistributorHttpClient($productDTOFactoryMock, $stockDTOFactoryMock))->fetchStocks();
+
+        self::assertEquals(collect([$stockDTOMock]), $stocks);
     }
 }
