@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unique(['product_id', 'tag_id']);
         });
     }
+
     public function down(): void
     {
         Schema::dropIfExists('product_tag');

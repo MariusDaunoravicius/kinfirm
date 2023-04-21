@@ -10,7 +10,7 @@ use App\Factories\ProductDTOFactory;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
-class LaravelTaskHttpClientTest extends TestCase
+class DistributorClientTest extends TestCase
 {
     public function test_fetch_products(): void
     {
