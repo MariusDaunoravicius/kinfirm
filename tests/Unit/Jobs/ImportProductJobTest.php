@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jobs;
 
-use _PHPStan_532094bc1\Nette\Neon\Exception;
 use App\Exceptions\ProductImportFailed;
 use App\Jobs\ImportProductJob;
 use App\Models\Product;
 use App\Services\ProductCreator;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 

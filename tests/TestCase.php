@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\DTO\ProductDTO;
+use App\DTO\StockDTO;
 use App\DTO\TagDTO;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Carbon;
@@ -52,6 +53,25 @@ abstract class TestCase extends BaseTestCase
 
         return new TagDTO(
             title: $data['title'],
+        );
+    }
+
+    protected function mockStockDTO(array $variables = []): StockDTO
+    {
+        $sku = fake()->word;
+        $stock = fake()->randomNumber(2);
+        $city = fake()->city;
+
+        $data = array_merge(compact(
+            'sku',
+            'stock',
+            'city',
+        ), $variables);
+
+        return new StockDTO(
+            sku: $data['sku'],
+            stock: $data['stock'],
+            city: $data['city'],
         );
     }
 }

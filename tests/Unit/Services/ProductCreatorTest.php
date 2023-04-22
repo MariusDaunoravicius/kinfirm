@@ -57,12 +57,12 @@ class ProductCreatorTest extends TestCase
         );
     }
 
-    public function test_create_fail(): void
+    public function test_create_should_rollback_db_changes_on_exception(): void
     {
         $productDTO = $this->mockProductDTO();
 
-        DB::shouldReceive('beginTransaction')->once()->andThrowExceptions([new Exception()]);
-        DB::shouldReceive('commit')->never();
+        DB::shouldReceive('beginTransaction')->once();
+        DB::shouldReceive('commit')->once()->andThrowExceptions([new Exception()]);
         DB::shouldReceive('rollBack')->once();
 
         $this->expectException(Exception::class);
