@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Console\Commands;
 
 use App\Clients\Contracts\DistributorClient;
-use App\Console\Commands\ImportProductsCommand;
 use App\Console\Commands\ImportStocksCommand;
-use App\Jobs\ImportProductJob;
 use App\Jobs\ImportStockJob;
 use Illuminate\Support\Facades\Bus;
 use Tests\TestCase;
