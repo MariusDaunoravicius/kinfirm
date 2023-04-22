@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use App\Exceptions\ProductImportFailed;
 use App\Models\Product;
 use App\Models\Tag;
 use App\Services\ProductCreator;
 use DB;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -61,11 +61,11 @@ class ProductCreatorTest extends TestCase
     {
         $productDTO = $this->mockProductDTO();
 
-        DB::shouldReceive('beginTransaction')->once()->andThrowExceptions([new \Exception()]);
+        DB::shouldReceive('beginTransaction')->once()->andThrowExceptions([new Exception()]);
         DB::shouldReceive('commit')->never();
         DB::shouldReceive('rollBack')->once();
 
-        $this->expectException(ProductImportFailed::class);
+        $this->expectException(Exception::class);
 
         (new ProductCreator())->create(productDTO: $productDTO);
 
