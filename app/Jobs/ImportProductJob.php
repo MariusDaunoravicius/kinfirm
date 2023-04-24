@@ -5,36 +5,41 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\DTO\ProductDTO;
-use App\Exceptions\ProductImportFailed;
 use App\Services\ProductCreator;
 use Exception;
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ImportProductJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * @param  Collection<int,ProductDTO>  $productDTOs
+     */
     public function __construct(
-        private readonly ProductDTO $productDTO,
+        private readonly Collection $productDTOs,
     ) {
     }
 
     public function handle(ProductCreator $productCreator): void
     {
         try {
-            $productCreator->create(productDTO: $this->productDTO);
-        } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            DB::beginTransaction();
 
-            throw new ProductImportFailed(
-                message: sprintf('Failed to import product with SKU [%s]', $this->productDTO->getSKU()),
-                previous: $exception,
-            );
+            $this->productDTOs->each(fn (ProductDTO $productDTO) => $productCreator->create(productDTO: $productDTO));
+
+            DB::commit();
+        } catch (Exception $exception) {
+            DB::rollBack();
+
+            throw $exception;
         }
     }
 }

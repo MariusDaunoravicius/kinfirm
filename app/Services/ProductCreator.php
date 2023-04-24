@@ -6,31 +6,28 @@ namespace App\Services;
 
 use App\DTO\ProductDTO;
 use App\DTO\TagDTO;
+use App\Exceptions\ProductImportFailed;
 use App\Models\Product;
 use App\Models\Tag;
 use Exception;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class ProductCreator
 {
     public function create(ProductDTO $productDTO): Product
     {
         try {
-            DB::beginTransaction();
-
             $tagIds = $this->createTags(tags: $productDTO->getTags());
 
             $product = $this->createProduct($productDTO);
             $product->tags()->attach(id: $tagIds);
 
-            DB::commit();
-
             return $product;
         } catch (Exception $exception) {
-            DB::rollBack();
-
-            throw $exception;
+            throw new ProductImportFailed(
+                message: sprintf('Failed to import product with SKU [%s]', $productDTO->getSKU()),
+                previous: $exception,
+            );
         }
     }
 

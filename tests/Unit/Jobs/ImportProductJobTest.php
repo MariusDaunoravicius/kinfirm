@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jobs;
 
-use App\Exceptions\ProductImportFailed;
 use App\Jobs\ImportProductJob;
 use App\Models\Product;
 use App\Services\ProductCreator;
 use Exception;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ImportProductJobTest extends TestCase
@@ -17,14 +16,16 @@ class ImportProductJobTest extends TestCase
     public function test_handle_success(): void
     {
         $productDTO = $this->mockProductDTO();
+        $otherProductDTO = $this->mockProductDTO();
+        $productDTOs = collect([$productDTO, $otherProductDTO]);
 
         $productCreatorMock = $this->createMock(originalClassName: ProductCreator::class);
         $productCreatorMock
+            ->expects(self::exactly(2))
             ->method('create')
-            ->with($productDTO)
             ->willReturn(Product::factory()->make());
 
-        $importProduct = new ImportProductJob(productDTO: $productDTO);
+        $importProduct = new ImportProductJob(productDTOs: $productDTOs);
         $importProduct->handle(productCreator: $productCreatorMock);
 
         self::addToAssertionCount(1);
@@ -33,21 +34,25 @@ class ImportProductJobTest extends TestCase
     public function test_handle_fail(): void
     {
         $productDTO = $this->mockProductDTO();
-        $exceptionMessage = fake()->text;
+        $otherProductDTO = $this->mockProductDTO();
+        $productDTOs = collect([$productDTO, $otherProductDTO]);
 
         $productCreatorMock = $this->createMock(originalClassName: ProductCreator::class);
         $productCreatorMock
+            ->expects(self::exactly(2))
             ->method('create')
-            ->with($productDTO)
-            ->willThrowException(new Exception(message: $exceptionMessage));
+            ->willReturnOnConsecutiveCalls(
+                Product::factory()->make(),
+                $this->throwException(new Exception()),
+            );
 
-        Log::shouldReceive('error')->with($exceptionMessage);
+        self::expectException(Exception::class);
 
-        self::expectException(ProductImportFailed::class);
+        DB::shouldReceive('beginTransaction')->once();
+        DB::shouldReceive('commit')->never();
+        DB::shouldReceive('rollBack')->once();
 
-        $importProduct = new ImportProductJob(productDTO: $productDTO);
+        $importProduct = new ImportProductJob(productDTOs: $productDTOs);
         $importProduct->handle(productCreator: $productCreatorMock);
-
-        self::addToAssertionCount(1);
     }
 }
