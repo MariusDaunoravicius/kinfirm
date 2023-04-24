@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
-            $table->string('sku')->index();
+            $table->string('sku')->unique();
             $table->string('description');
             $table->string('size');
             $table->string('photo');

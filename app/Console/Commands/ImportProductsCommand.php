@@ -6,10 +6,12 @@ namespace App\Console\Commands;
 
 use App\Clients\Contracts\DistributorClient;
 use App\Jobs\ImportProductJob;
+use App\Services\ProductFetcher;
 use Illuminate\Bus\Batch;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Cache;
 
 class ImportProductsCommand extends Command
 {
@@ -34,7 +36,7 @@ class ImportProductsCommand extends Command
         Bus::batch($jobs)
             ->name('import-products')
             ->finally(function (Batch $batch) {
-                // TODO:  Clear cache
+                Cache::tags(names: [ProductFetcher::PRODUCT_TAG_CACHE_KEY])->flush();
             })->dispatch();
     }
 }
