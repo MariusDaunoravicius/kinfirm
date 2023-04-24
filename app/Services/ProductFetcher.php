@@ -45,7 +45,7 @@ class ProductFetcher
                 key: $this->getProductCacheKey($sku),
                 ttl: self::HOUR_IN_SECONDS,
                 callback: function () use ($sku): Product {
-                    return Product::where('sku', $sku)->firstOrFail();
+                    return Product::with('tags')->where('sku', $sku)->firstOrFail();
                 },
             );
     }

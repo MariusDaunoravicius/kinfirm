@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\DTO\ProductDTO;
+use App\Models\Product;
 use App\Services\ProductCreator;
 use Exception;
 use Illuminate\Bus\Batchable;
@@ -33,7 +34,7 @@ class ImportProductJob implements ShouldQueue
         try {
             DB::beginTransaction();
 
-            $this->productDTOs->each(fn (ProductDTO $productDTO) => $productCreator->create(productDTO: $productDTO));
+            $this->productDTOs->each(fn (ProductDTO $productDTO): Product => $productCreator->create(productDTO: $productDTO));
 
             DB::commit();
         } catch (Exception $exception) {

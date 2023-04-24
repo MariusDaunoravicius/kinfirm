@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\DTO\StockDTO;
+use App\Models\Stock;
 use App\Services\StockCreator;
 use Exception;
 use Illuminate\Bus\Batchable;
@@ -30,7 +31,7 @@ class ImportStockJob implements ShouldQueue
         try {
             DB::beginTransaction();
 
-            $this->stockDTOs->each(fn (StockDTO $stockDTO) => $stockCreator->create(stockDTO: $stockDTO));
+            $this->stockDTOs->each(fn (StockDTO $stockDTO): Stock => $stockCreator->create(stockDTO: $stockDTO));
 
             DB::commit();
         } catch (Exception $exception) {

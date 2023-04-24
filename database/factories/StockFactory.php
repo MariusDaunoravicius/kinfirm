@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Symfony\Component\Uid\Ulid;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Stock>
- */
 class StockFactory extends Factory
 {
     /**
@@ -19,7 +18,18 @@ class StockFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'sku' => fake()->word,
+            'stock' => fake()->randomNumber(nbDigits: 2),
+            'city_id' => Ulid::generate(),
         ];
+    }
+
+    public function withCity(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'city_id' => City::factory()->create()->id,
+            ];
+        });
     }
 }

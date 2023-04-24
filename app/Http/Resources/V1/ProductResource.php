@@ -4,6 +4,7 @@ namespace App\Http\Resources\V1;
 
 use App\Models\Product;
 use App\Models\Stock;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,6 +26,7 @@ class ProductResource extends JsonResource
             'size' => $this->resource->size,
             'photo' => $this->resource->photo,
             'updated_at' => $this->resource->updated_at->format(format: 'Y-m-d'),
+            'tags' => $this->resource->tags->map(static fn (Tag $tag): TagResource => new TagResource($tag)),
             'stock' => $this->resource->stocks->map(static fn (Stock $stock): StockResource => new StockResource($stock)),
         ];
     }
