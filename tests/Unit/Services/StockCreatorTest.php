@@ -6,8 +6,6 @@ namespace Tests\Unit\Services;
 
 use App\Models\City;
 use App\Services\StockCreator;
-use DB;
-use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -43,20 +41,5 @@ class StockCreatorTest extends TestCase
             ]
         );
         self::assertDatabaseHas(table: 'cities', data: ['name' => $stockDTO->getCity()]);
-    }
-
-    public function test_create_should_rollback_db_changes_on_exception(): void
-    {
-        $stockDTO = $this->mockStockDTO();
-
-        DB::shouldReceive('beginTransaction')->once();
-        DB::shouldReceive('commit')->once()->andThrowExceptions([new Exception()]);
-        DB::shouldReceive('rollBack')->once();
-
-        $this->expectException(Exception::class);
-
-        (new StockCreator())->create(stockDTO: $stockDTO);
-
-        self::assertDatabaseMissing(table: 'stocks', data: ['sku' => $stockDTO->getSKU()]);
     }
 }

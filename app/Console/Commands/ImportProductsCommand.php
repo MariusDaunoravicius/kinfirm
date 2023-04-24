@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Bus;
 
 class ImportProductsCommand extends Command
 {
-    public const BATCH_SIZE = 10;
+    private const BATCH_SIZE = 10;
 
     protected $signature = 'app:import-products';
 

@@ -6,7 +6,7 @@ namespace Tests\Unit\Console\Commands;
 
 use App\Clients\Contracts\DistributorClient;
 use App\Console\Commands\ImportStocksCommand;
-use App\Jobs\ImportStockJob;
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Facades\Bus;
 use Tests\TestCase;
 
@@ -24,6 +24,9 @@ class ImportStocksCommandTest extends TestCase
 
         (new ImportStocksCommand($distributorClientMock))->handle();
 
-        Bus::assertDispatched(ImportStockJob::class);
+        Bus::assertBatched(function (PendingBatch $batch) {
+            return $batch->name == 'import-stocks' &&
+                $batch->jobs->count() === 1;
+        });
     }
 }

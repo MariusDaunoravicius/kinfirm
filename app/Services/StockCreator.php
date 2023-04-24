@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\DTO\StockDTO;
+use App\Exceptions\StockImportFailed;
 use App\Models\City;
 use App\Models\Stock;
 use Exception;
-use Illuminate\Support\Facades\DB;
 
 class StockCreator
 {
     public function create(StockDTO $stockDTO): Stock
     {
         try {
-            DB::beginTransaction();
-
             $city = $this->createCity(name: $stockDTO->getCity());
             $stock = $this->createStock(
                 cityId: $city->id,
@@ -24,13 +22,16 @@ class StockCreator
                 stock: $stockDTO->getStock(),
             );
 
-            DB::commit();
-
             return $stock;
         } catch (Exception $exception) {
-            DB::rollBack();
-
-            throw $exception;
+            throw new StockImportFailed(
+                message: sprintf(
+                    'Failed to import stock with SKU [%s], city [%s]',
+                    $stockDTO->getSKU(),
+                    $stockDTO->getCity(),
+                ),
+                previous: $exception,
+            );
         }
     }
 

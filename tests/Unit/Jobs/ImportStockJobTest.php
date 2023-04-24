@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jobs;
 
-use App\Exceptions\StockImportFailed;
 use App\Jobs\ImportStockJob;
 use App\Models\Stock;
 use App\Services\StockCreator;
 use Exception;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ImportStockJobTest extends TestCase
@@ -17,37 +16,41 @@ class ImportStockJobTest extends TestCase
     public function test_handle_success(): void
     {
         $stockDTO = $this->mockStockDTO();
+        $otherStockDTO = $this->mockStockDTO();
+        $stockDTOs = collect([$stockDTO, $otherStockDTO]);
 
         $stockCreatorMock = $this->createMock(originalClassName: StockCreator::class);
         $stockCreatorMock
+            ->expects(self::exactly(2))
             ->method('create')
-            ->with($stockDTO)
             ->willReturn(Stock::factory()->make());
 
-        $importStockJob = new ImportStockJob(stockDTO: $stockDTO);
+        $importStockJob = new ImportStockJob(stockDTOs: $stockDTOs);
         $importStockJob->handle(stockCreator: $stockCreatorMock);
-
-        self::addToAssertionCount(1);
     }
 
     public function test_handle_should_log_exception_on_fail(): void
     {
         $stockDTO = $this->mockStockDTO();
-        $exceptionMessage = fake()->text;
+        $otherStockDTO = $this->mockStockDTO();
+        $stockDTOs = collect([$stockDTO, $otherStockDTO]);
 
         $stockCreatorMock = $this->createMock(originalClassName: StockCreator::class);
         $stockCreatorMock
+            ->expects(self::exactly(2))
             ->method('create')
-            ->with($stockDTO)
-            ->willThrowException(new Exception(message: $exceptionMessage));
+            ->willReturnOnConsecutiveCalls(
+                Stock::factory()->make(),
+                $this->throwException(new Exception()),
+            );
 
-        Log::shouldReceive('error')->with($exceptionMessage);
+        self::expectException(Exception::class);
 
-        self::expectException(StockImportFailed::class);
+        DB::shouldReceive('beginTransaction')->once();
+        DB::shouldReceive('commit')->never();
+        DB::shouldReceive('rollBack')->once();
 
-        $importStockJob = new ImportStockJob(stockDTO: $stockDTO);
+        $importStockJob = new ImportStockJob(stockDTOs: $stockDTOs);
         $importStockJob->handle(stockCreator: $stockCreatorMock);
-
-        self::addToAssertionCount(1);
     }
 }

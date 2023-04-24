@@ -3,41 +3,40 @@
 namespace App\Jobs;
 
 use App\DTO\StockDTO;
-use App\Exceptions\StockImportFailed;
 use App\Services\StockCreator;
 use Exception;
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ImportStockJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(private readonly StockDTO $stockDTO)
+    /**
+     * @param  Collection<int,StockDTO>  $stockDTOs
+     */
+    public function __construct(private readonly Collection $stockDTOs)
     {
     }
 
     public function handle(StockCreator $stockCreator): void
     {
         try {
-            $stockCreator->create(stockDTO: $this->stockDTO);
+            DB::beginTransaction();
+
+            $this->stockDTOs->each(fn (StockDTO $stockDTO) => $stockCreator->create(stockDTO: $stockDTO));
+
+            DB::commit();
         } catch (Exception $exception) {
-            $message = sprintf(
-                'Failed to import stock with SKU [%s], city [%s]',
-                $this->stockDTO->getSKU(),
-                $this->stockDTO->getCity(),
-            );
+            DB::rollBack();
 
-            Log::error(message: $exception->getMessage());
-
-            throw new StockImportFailed(
-                message: $message,
-                previous: $exception,
-            );
+            throw $exception;
         }
     }
 }
