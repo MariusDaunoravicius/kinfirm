@@ -6,7 +6,7 @@
 
 ## Project
 * Docker must be running
-* Run cp env.example .env
+* Run `cp env.example .env`
 * Run `./vendor/bin/sail up`
 * Run `./vendor/bin/sail php artisan migrate`
 * To import products run `./vendor/bin/sail php artisan app:import-products`
